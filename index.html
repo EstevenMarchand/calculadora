@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora</title>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#f4f6f8;
+      margin:0;
+      display:flex;
+      min-height:100vh;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .card{
+      width:100%;
+      max-width:420px;
+      background:white;
+      border-radius:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+      padding:18px;
+    }
+    h1{ font-size:20px; margin:0 0 14px; }
+    .row{ display:flex; gap:10px; margin-bottom:10px; }
+    input, select, button{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid #d7dde3;
+      font-size:14px;
+    }
+    button{
+      cursor:pointer;
+      border:none;
+      background:#2563eb;
+      color:white;
+      font-weight:600;
+    }
+    button.secondary{ background:#111827; }
+    .result{
+      margin-top:12px;
+      padding:12px;
+      border-radius:12px;
+      background:#f1f5f9;
+      border:1px solid #e2e8f0;
+      font-size:15px;
+    }
+    .error{
+      margin-top:10px;
+      color:#b91c1c;
+      font-size:14px;
+      min-height:18px;
+    }
+    .hint{ font-size:12px; color:#6b7280; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Calculadora</h1>
+
+    <div class="row">
+      <input id="a" type="number" step="any" placeholder="Número 1" />
+      <input id="b" type="number" step="any" placeholder="Número 2" />
+    </div>
+
+    <div class="row">
+      <select id="op">
+        <option value="sumar">Sumar (+)</option>
+        <option value="restar">Restar (−)</option>
+        <option value="multiplicar">Multiplicar (×)</option>
+        <option value="dividir">Dividir (÷)</option>
+      </select>
+      <button id="btn">Calcular</button>
+    </div>
+
+    <button class="secondary" id="clear">Limpiar</button>
+
+    <div class="error" id="err"></div>
+    <div class="result" id="out">Resultado: —</div>
+
+    <div class="hint">Tip: también puedes presionar Enter para calcular.</div>
+  </main>
+
+  <script>
+    const $a = document.getElementById("a");
+    const $b = document.getElementById("b");
+    const $op = document.getElementById("op");
+    const $out = document.getElementById("out");
+    const $err = document.getElementById("err");
+    const $btn = document.getElementById("btn");
+    const $clear = document.getElementById("clear");
+
+    function parseNumber(el){
+      const v = el.value;
+      if (v === "" || v === null || v === undefined) return null;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function calcular(){
+      $err.textContent = "";
+
+      const a = parseNumber($a);
+      const b = parseNumber($b);
+
+      if (a === null || b === null){
+        $err.textContent = "Ingresa dos números válidos.";
+        $out.textContent = "Resultado: —";
+        return;
+      }
+
+      let r;
+      switch($op.value){
+        case "sumar":
+          r = a + b;
+          break;
+        case "restar":
+          r = a - b;
+          break;
+        case "multiplicar":
+          r = a * b;
+          break;
+        case "dividir":
+          if (b === 0){
+            $err.textContent = "No se puede dividir entre 0.";
+            $out.textContent = "Resultado: —";
+            return;
+          }
+          r = a / b;
+          break;
+        default:
+          $err.textContent = "Operación no válida.";
+          $out.textContent = "Resultado: —";
+          return;
+      }
+
+      // mostrar con máximo 10 decimales sin ceros extra
+      const pretty = (Math.round(r * 1e10) / 1e10).toString();
+      $out.textContent = `Resultado: ${pretty}`;
+    }
+
+    $btn.addEventListener("click", calcular);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calcular();
+    });
+
+    $clear.addEventListener("click", () => {
+      $a.value = "";
+      $b.value = "";
+      $op.value = "sumar";
+      $err.textContent = "";
+      $out.textContent = "Resultado: —";
+      $a.focus();
+    });
+  </script>
+</body>
+</html>
